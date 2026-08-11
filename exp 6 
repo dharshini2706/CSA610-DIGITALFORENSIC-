@@ -1,0 +1,195 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMtEX8tavj+CCpjHuLHBlHl",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/dharshini2706/CSA610-DIGITALFORENSIC-/blob/main/exp%206%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "r1-nuGswy8We"
+      },
+      "outputs": [],
+      "source": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Aim: Write a Python program to create a bit-stream forensic copy of a file and verify its integrity using hashing."
+      ],
+      "metadata": {
+        "id": "mXCA1G5Ry9QZ"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Algorithm\n",
+        "1. Open the source file and read it in fixed-size blocks (bit-stream fashion).\n",
+        "2. Write each block sequentially to a destination file, creating an exact bit-for-bit copy.\n",
+        "3. Compute a cryptographic hash (SHA-256) of the source file by reading it block-by-block.\n",
+        "4. Compute the same hash for the newly created destination (forensic copy) file.\n",
+        "5. Compare the two hash values: if they match, the copy is verified as forensically sound.\n",
+        "6. (Demonstration) Tamper with a byte in the copy and re-verify to show that hashing detects any alteration."
+      ],
+      "metadata": {
+        "id": "u-l2a7Koy-IP"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import hashlib\n",
+        "import os\n",
+        "import shutil\n",
+        "import time\n",
+        "\n",
+        "\n",
+        "def calculate_hash(file_path, algorithm=\"sha256\", block_size=65536):\n",
+        "    \"\"\"Calculate the hash of a file by reading it in fixed-size blocks (bit-stream style).\"\"\"\n",
+        "    hash_obj = hashlib.new(algorithm)\n",
+        "    with open(file_path, \"rb\") as f:\n",
+        "        while True:\n",
+        "            block = f.read(block_size)\n",
+        "            if not block:\n",
+        "                break\n",
+        "            hash_obj.update(block)\n",
+        "    return hash_obj.hexdigest()\n",
+        "\n",
+        "\n",
+        "def create_forensic_copy(source_path, dest_path, block_size=65536):\n",
+        "    \"\"\"Create a bit-for-bit (byte-stream) copy of the source file.\"\"\"\n",
+        "    bytes_copied = 0\n",
+        "    with open(source_path, \"rb\") as src, open(dest_path, \"wb\") as dst:\n",
+        "        while True:\n",
+        "            block = src.read(block_size)\n",
+        "            if not block:\n",
+        "                break\n",
+        "            dst.write(block)\n",
+        "            bytes_copied += len(block)\n",
+        "    return bytes_copied\n",
+        "\n",
+        "\n",
+        "def verify_integrity(source_path, dest_path, algorithm=\"sha256\"):\n",
+        "    \"\"\"Verify that source and destination files are identical by comparing hashes.\"\"\"\n",
+        "    source_hash = calculate_hash(source_path, algorithm)\n",
+        "    dest_hash = calculate_hash(dest_path, algorithm)\n",
+        "    return source_hash, dest_hash, source_hash == dest_hash\n",
+        "\n",
+        "\n",
+        "def main():\n",
+        "    source_path = \"evidence_original.dat\"\n",
+        "    dest_path = \"evidence_forensic_copy.dat\"\n",
+        "\n",
+        "    # Create a sample evidence file for demonstration\n",
+        "    with open(source_path, \"wb\") as f:\n",
+        "        f.write(os.urandom(1024) + b\"CONFIDENTIAL EVIDENCE DATA\" * 50)\n",
+        "\n",
+        "    print(\"=\" * 60)\n",
+        "    print(\"BIT-STREAM FORENSIC COPY UTILITY\")\n",
+        "    print(\"=\" * 60)\n",
+        "\n",
+        "    start_time = time.time()\n",
+        "    size = create_forensic_copy(source_path, dest_path)\n",
+        "    duration = time.time() - start_time\n",
+        "\n",
+        "    print(f\"Source file      : {source_path}\")\n",
+        "    print(f\"Destination file : {dest_path}\")\n",
+        "    print(f\"Bytes copied     : {size}\")\n",
+        "    print(f\"Time taken       : {duration:.6f} seconds\")\n",
+        "    print(\"-\" * 60)\n",
+        "\n",
+        "    src_hash, dst_hash, match = verify_integrity(source_path, dest_path, \"sha256\")\n",
+        "    print(f\"SHA-256 (Source)      : {src_hash}\")\n",
+        "    print(f\"SHA-256 (Copy)        : {dst_hash}\")\n",
+        "    print(f\"Integrity Verified    : {'PASS - Hashes Match' if match else 'FAIL - Hashes Differ'}\")\n",
+        "\n",
+        "    # Tamper test to show detection of mismatch\n",
+        "    print(\"-\" * 60)\n",
+        "    print(\"Simulating tampering on the copy to demonstrate detection...\")\n",
+        "    with open(dest_path, \"r+b\") as f:\n",
+        "        f.seek(0)\n",
+        "        f.write(b\"X\")\n",
+        "    _, _, match_after = verify_integrity(source_path, dest_path, \"sha256\")\n",
+        "    print(f\"Integrity After Tampering: {'PASS - Hashes Match' if match_after else 'FAIL - Hashes Differ (tampering detected)'}\")\n",
+        "\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    main()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 108
+        },
+        "id": "SSa9O9BVzPM9",
+        "outputId": "f46d14cb-2dc8-4346-f566-470f4c95a748"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "IndentationError",
+          "evalue": "unexpected indent (2380566134.py, line 13)",
+          "traceback": [
+            "\u001b[0;36m  File \u001b[0;32m\"/tmp/ipykernel_2498/2380566134.py\"\u001b[0;36m, line \u001b[0;32m13\u001b[0m\n\u001b[0;31m    hash_obj = hashlib.new(algorithm)\u001b[0m\n\u001b[0m    ^\u001b[0m\n\u001b[0;31mIndentationError\u001b[0m\u001b[0;31m:\u001b[0m unexpected indent\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "============================================================\n",
+        "BIT-STREAM FORENSIC COPY UTILITY\n",
+        "============================================================\n",
+        "Source file      : evidence_original.dat\n",
+        "Destination file : evidence_forensic_copy.dat\n",
+        "Bytes copied     : 2324\n",
+        "Time taken       : 0.000096 seconds\n",
+        "------------------------------------------------------------\n",
+        "SHA-256 (Source)      : 73c9fc81508f831abad389cf8afa32bc91c8b024be5e64d56103048ee518d09a\n",
+        "SHA-256 (Copy)        : 73c9fc81508f831abad389cf8afa32bc91c8b024be5e64d56103048ee518d09a\n",
+        "Integrity Verified    : PASS - Hashes Match\n",
+        "------------------------------------------------------------\n",
+        "Simulating tampering on the copy to demonstrate detection...\n",
+        "Integrity After Tampering: FAIL - Hashes Differ (tampering detected)"
+      ],
+      "metadata": {
+        "id": "9J_VWITxzb26"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "qLhlQpflzjwY"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
