@@ -1,0 +1,133 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNv7uBreASjKEfejM3gcdHN",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/1%20locards%20exchange%20principle%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "aBTPbSErHShQ",
+        "outputId": "64ff8b9b-2989-4af2-c623-e9bfaa554608"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n",
+            "BEFORE (observed at 2026-08-20 03:01:09.175210)\n",
+            "  accessed: 2026-08-20 03:01:09.173302\n",
+            "  modified: 2026-08-20 03:01:09.174302\n",
+            "  changed: 2026-08-20 03:01:09.174302\n",
+            "\n",
+            "AFTER (observed at 2026-08-20 03:01:10.176109)\n",
+            "  accessed: 2026-08-20 03:01:09.173302\n",
+            "  modified: 2026-08-20 03:01:10.175397\n",
+            "  changed: 2026-08-20 03:01:10.175397\n",
+            "\n",
+            "--- COMPARISON ---\n",
+            "\n",
+            "ACCESSED time changed: False\n",
+            "  [OBSERVED FACT] before: 2026-08-20 03:01:09.173302\n",
+            "  [OBSERVED FACT] after:  2026-08-20 03:01:09.173302\n",
+            "\n",
+            "MODIFIED time changed: True\n",
+            "  [OBSERVED FACT] before: 2026-08-20 03:01:09.174302\n",
+            "  [OBSERVED FACT] after:  2026-08-20 03:01:10.175397\n",
+            "  [INTERPRETATION] The file's modified time changing shows someone/something interacted with it -- a trace of that interaction, as predicted by Locard's Exchange Principle.\n",
+            "\n",
+            "CHANGED time changed: True\n",
+            "  [OBSERVED FACT] before: 2026-08-20 03:01:09.174302\n",
+            "  [OBSERVED FACT] after:  2026-08-20 03:01:10.175397\n",
+            "  [INTERPRETATION] The file's changed time changing shows someone/something interacted with it -- a trace of that interaction, as predicted by Locard's Exchange Principle.\n"
+          ]
+        }
+      ],
+      "source": [
+        "\"\"\"\n",
+        "Locard's Exchange Principle Demo (simple version)\n",
+        "\"Every contact leaves a trace\" -- shown here using file timestamps.\n",
+        "\"\"\"\n",
+        "\n",
+        "import os\n",
+        "import time\n",
+        "from datetime import datetime\n",
+        "\n",
+        "\n",
+        "def get_timestamps(path):\n",
+        "    \"\"\"Return a file's access, modify, and change times.\"\"\"\n",
+        "    stat = os.stat(path)\n",
+        "    return {\n",
+        "        \"accessed\": stat.st_atime,\n",
+        "        \"modified\": stat.st_mtime,\n",
+        "        \"changed\": stat.st_ctime,\n",
+        "    }\n",
+        "\n",
+        "\n",
+        "def show(label, timestamps, observed_at):\n",
+        "    print(f\"\\n{label} (observed at {observed_at})\")\n",
+        "    for name, value in timestamps.items():\n",
+        "        readable = datetime.fromtimestamp(value)\n",
+        "        print(f\"  {name}: {readable}\")\n",
+        "\n",
+        "\n",
+        "# 1. Set up the test file\n",
+        "filename = \"test_file.txt\"\n",
+        "with open(filename, \"w\") as f:\n",
+        "    f.write(\"Original content.\\n\")\n",
+        "\n",
+        "# 2. Capture timestamps BEFORE the operation\n",
+        "before = get_timestamps(filename)\n",
+        "show(\"BEFORE\", before, datetime.now())\n",
+        "\n",
+        "# 3. Perform a controlled operation (open + modify the file)\n",
+        "time.sleep(1)  # small delay so timestamp changes are visible\n",
+        "with open(filename, \"a\") as f:\n",
+        "    f.write(\"New line added by controlled operation.\\n\")\n",
+        "\n",
+        "# 4. Capture timestamps AFTER the operation\n",
+        "after = get_timestamps(filename)\n",
+        "show(\"AFTER\", after, datetime.now())\n",
+        "\n",
+        "# 5. Compare and report\n",
+        "print(\"\\n--- COMPARISON ---\")\n",
+        "for key in before:\n",
+        "    changed = before[key] != after[key]\n",
+        "    print(f\"\\n{key.upper()} time changed: {changed}\")\n",
+        "    print(f\"  [OBSERVED FACT] before: {datetime.fromtimestamp(before[key])}\")\n",
+        "    print(f\"  [OBSERVED FACT] after:  {datetime.fromtimestamp(after[key])}\")\n",
+        "    if changed:\n",
+        "        print(f\"  [INTERPRETATION] The file's {key} time changing shows \"\n",
+        "              f\"someone/something interacted with it -- a trace of that \"\n",
+        "              f\"interaction, as predicted by Locard's Exchange Principle.\")"
+      ]
+    }
+  ]
+}
