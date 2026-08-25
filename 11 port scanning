@@ -1,0 +1,73 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMqqXD+QkJs8XT8OPyw9SP7",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/11%20port%20scanning\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6leOiN9g3-NZ",
+        "outputId": "8901aeb7-dcdd-4376-ef8f-a667580ca559"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "A -> Vertical scan (many ports)\n",
+            "A -> Horizontal scan (many hosts)\n"
+          ]
+        }
+      ],
+      "source": [
+        "from collections import defaultdict\n",
+        "\n",
+        "conn = [\n",
+        "    (\"A\", \"H1\", 22), (\"A\", \"H1\", 23), (\"A\", \"H1\", 80),\n",
+        "    (\"A\", \"H2\", 21), (\"A\", \"H3\", 21),\n",
+        "    (\"B\", \"H1\", 80)\n",
+        "]\n",
+        "\n",
+        "ports = defaultdict(set)\n",
+        "hosts = defaultdict(set)\n",
+        "\n",
+        "for src, dst, port in conn:\n",
+        "    ports[src].add(port)\n",
+        "    hosts[src].add(dst)\n",
+        "\n",
+        "for src in ports:\n",
+        "    if len(ports[src]) >= 3:\n",
+        "        print(src, \"-> Vertical scan (many ports)\")\n",
+        "    if len(hosts[src]) >= 2:\n",
+        "        print(src, \"-> Horizontal scan (many hosts)\")"
+      ]
+    }
+  ]
+}
