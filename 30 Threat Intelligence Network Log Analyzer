@@ -1,0 +1,119 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMqLb5XpRYqwEs/VGnDWyWk",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/30%20Threat%20Intelligence%20Network%20Log%20Analyzer\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "log = [\n",
+        "    {\"time\": \"10:00:00\", \"type\": \"process\", \"detail\": \"unknown.exe started\"},\n",
+        "    {\"time\": \"10:00:05\", \"type\": \"file\", \"detail\": \"doc1.txt renamed to doc1.locked\"},\n",
+        "    {\"time\": \"10:00:10\", \"type\": \"file\", \"detail\": \"doc2.txt renamed to doc2.locked\"},\n",
+        "    {\"time\": \"10:00:15\", \"type\": \"network\", \"detail\": \"connection to external IP\"},\n",
+        "]\n",
+        "\n",
+        "log.sort(key=lambda x: x[\"time\"])\n",
+        "\n",
+        "print(\"Incident Timeline:\")\n",
+        "for entry in log:\n",
+        "    print(entry[\"time\"], \"|\", entry[\"type\"], \"|\", entry[\"detail\"])\n",
+        "\n",
+        "print(\"\\nEarliest suspicious event:\", log[0][\"detail\"], \"at\", log[0][\"time\"])\n",
+        "print(\"Final observed activity:\", log[-1][\"detail\"], \"at\", log[-1][\"time\"])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "4wEfRJH4V2-O",
+        "outputId": "2e23ec33-cc5a-4648-9800-4f52cfeb0d48"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Incident Timeline:\n",
+            "10:00:00 | process | unknown.exe started\n",
+            "10:00:05 | file | doc1.txt renamed to doc1.locked\n",
+            "10:00:10 | file | doc2.txt renamed to doc2.locked\n",
+            "10:00:15 | network | connection to external IP\n",
+            "\n",
+            "Earliest suspicious event: unknown.exe started at 10:00:00\n",
+            "Final observed activity: connection to external IP at 10:00:15\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "threat_ips = [\"185.23.45.6\", \"91.203.5.10\"]\n",
+        "\n",
+        "logs = [\n",
+        "    {\"src\": \"185.23.45.6\", \"dst\": \"192.168.1.5\", \"port\": 443, \"time\": \"10:00\"},\n",
+        "    {\"src\": \"192.168.1.10\", \"dst\": \"8.8.8.8\", \"port\": 53, \"time\": \"10:01\"},\n",
+        "    {\"src\": \"185.23.45.6\", \"dst\": \"192.168.1.7\", \"port\": 22, \"time\": \"10:02\"},\n",
+        "]\n",
+        "\n",
+        "print(\"Threat Intel Matches:\")\n",
+        "for ip in threat_ips:\n",
+        "    matches = [l for l in logs if l[\"src\"] == ip]\n",
+        "    if matches:\n",
+        "        print(f\"\\nFlagged IP: {ip}\")\n",
+        "        print(\"Events:\", len(matches))\n",
+        "        print(\"Destinations:\", [m[\"dst\"] for m in matches])\n",
+        "        print(\"Ports:\", [m[\"port\"] for m in matches])\n",
+        "        print(\"Times:\", [m[\"time\"] for m in matches])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1DfQqmdDWBv6",
+        "outputId": "b5dc7b34-67d3-4e90-df88-6f9d75a169cf"
+      },
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Threat Intel Matches:\n",
+            "\n",
+            "Flagged IP: 185.23.45.6\n",
+            "Events: 2\n",
+            "Destinations: ['192.168.1.5', '192.168.1.7']\n",
+            "Ports: [443, 22]\n",
+            "Times: ['10:00', '10:02']\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
