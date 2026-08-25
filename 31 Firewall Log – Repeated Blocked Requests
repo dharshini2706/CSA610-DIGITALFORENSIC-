@@ -1,0 +1,72 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyP+1kJZ4Drzzbsv0puSVbRb",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/31%20Firewall%20Log%20%E2%80%93%20Repeated%20Blocked%20Requests\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from collections import defaultdict\n",
+        "\n",
+        "firewall_logs = [\n",
+        "    {\"src\": \"10.0.0.5\", \"dst_port\": 22, \"action\": \"blocked\", \"time\": \"10:00\"},\n",
+        "    {\"src\": \"10.0.0.5\", \"dst_port\": 22, \"action\": \"blocked\", \"time\": \"10:01\"},\n",
+        "    {\"src\": \"10.0.0.5\", \"dst_port\": 22, \"action\": \"blocked\", \"time\": \"10:02\"},\n",
+        "    {\"src\": \"10.0.0.9\", \"dst_port\": 443, \"action\": \"allowed\", \"time\": \"10:03\"},\n",
+        "]\n",
+        "\n",
+        "blocked_count = defaultdict(int)\n",
+        "\n",
+        "for log in firewall_logs:\n",
+        "    if log[\"action\"] == \"blocked\":\n",
+        "        blocked_count[(log[\"src\"], log[\"dst_port\"])] += 1\n",
+        "\n",
+        "print(\"Repeated Blocked Access Attempts:\")\n",
+        "for (src, port), count in blocked_count.items():\n",
+        "    if count >= 3:\n",
+        "        print(src, \"-> port\", port, \"- Blocked\", count, \"times\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6glygBBlWQaX",
+        "outputId": "0070fdbb-f1c6-45b8-fb7a-081a578258c0"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Repeated Blocked Access Attempts:\n",
+            "10.0.0.5 -> port 22 - Blocked 3 times\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
