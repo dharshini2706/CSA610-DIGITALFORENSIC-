@@ -1,0 +1,75 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNTxqvdTu9l0a8rNoJRJH/Q",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/28%20Ransomware%20Behavior%20Detection\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "file_events = [\n",
+        "    {\"file\": \"doc1.txt\", \"action\": \"rename\", \"new_ext\": \".locked\", \"time\": \"10:00:01\"},\n",
+        "    {\"file\": \"doc2.txt\", \"action\": \"rename\", \"new_ext\": \".locked\", \"time\": \"10:00:02\"},\n",
+        "    {\"file\": \"doc3.txt\", \"action\": \"modify\", \"new_ext\": \".locked\", \"time\": \"10:00:03\"},\n",
+        "    {\"file\": \"doc4.txt\", \"action\": \"rename\", \"new_ext\": \".locked\", \"time\": \"10:00:04\"},\n",
+        "]\n",
+        "\n",
+        "renamed_count = sum(1 for e in file_events if e[\"action\"] == \"rename\")\n",
+        "suspicious_ext = sum(1 for e in file_events if e[\"new_ext\"] == \".locked\")\n",
+        "\n",
+        "score = 0\n",
+        "if renamed_count >= 3:\n",
+        "    score += 1\n",
+        "if suspicious_ext >= 3:\n",
+        "    score += 1\n",
+        "\n",
+        "print(\"Files renamed:\", renamed_count)\n",
+        "print(\"Suspicious extension changes:\", suspicious_ext)\n",
+        "print(\"Risk Score:\", score, \"/2\")\n",
+        "print(\"Verdict:\", \"RANSOMWARE SUSPECTED\" if score == 2 else \"Low risk\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pfKOITgtVkp7",
+        "outputId": "d76551be-5c03-4de4-9888-3f30799b5b16"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Files renamed: 3\n",
+            "Suspicious extension changes: 4\n",
+            "Risk Score: 2 /2\n",
+            "Verdict: RANSOMWARE SUSPECTED\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
