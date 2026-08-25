@@ -1,0 +1,76 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOJv1mq1ODmfbtYooM/EKMg",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/21%20Recently%20Accessed%20Files\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "krR39mZFS530",
+        "outputId": "3d273862-aba0-47bb-e151-62d94a3ea81d"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Recently accessed files (newest first):\n",
+            "2026-01-06 11:30 - budget.xlsx by bob\n",
+            "2026-01-05 09:00 - report.docx by alice\n",
+            "2026-01-04 08:15 - notes.txt by alice\n",
+            "\n",
+            "Files accessed by alice:\n",
+            "report.docx - 2026-01-05 09:00\n",
+            "notes.txt - 2026-01-04 08:15\n"
+          ]
+        }
+      ],
+      "source": [
+        "logs = [\n",
+        "    {\"file\": \"report.docx\", \"user\": \"alice\", \"time\": \"2026-01-05 09:00\"},\n",
+        "    {\"file\": \"budget.xlsx\", \"user\": \"bob\",   \"time\": \"2026-01-06 11:30\"},\n",
+        "    {\"file\": \"notes.txt\",   \"user\": \"alice\", \"time\": \"2026-01-04 08:15\"},\n",
+        "]\n",
+        "\n",
+        "# sort newest first\n",
+        "logs.sort(key=lambda x: x[\"time\"], reverse=True)\n",
+        "\n",
+        "print(\"Recently accessed files (newest first):\")\n",
+        "for entry in logs:\n",
+        "    print(entry[\"time\"], \"-\", entry[\"file\"], \"by\", entry[\"user\"])\n",
+        "\n",
+        "print(\"\\nFiles accessed by alice:\")\n",
+        "for entry in logs:\n",
+        "    if entry[\"user\"] == \"alice\":\n",
+        "        print(entry[\"file\"], \"-\", entry[\"time\"])"
+      ]
+    }
+  ]
+}
