@@ -1,0 +1,336 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNIeCCydLoQTdh9PRqGj1Yp",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/27%20Permission%20Auditing%20Tool\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "krR39mZFS530",
+        "outputId": "3d273862-aba0-47bb-e151-62d94a3ea81d"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Recently accessed files (newest first):\n",
+            "2026-01-06 11:30 - budget.xlsx by bob\n",
+            "2026-01-05 09:00 - report.docx by alice\n",
+            "2026-01-04 08:15 - notes.txt by alice\n",
+            "\n",
+            "Files accessed by alice:\n",
+            "report.docx - 2026-01-05 09:00\n",
+            "notes.txt - 2026-01-04 08:15\n"
+          ]
+        }
+      ],
+      "source": [
+        "logs = [\n",
+        "    {\"file\": \"report.docx\", \"user\": \"alice\", \"time\": \"2026-01-05 09:00\"},\n",
+        "    {\"file\": \"budget.xlsx\", \"user\": \"bob\",   \"time\": \"2026-01-06 11:30\"},\n",
+        "    {\"file\": \"notes.txt\",   \"user\": \"alice\", \"time\": \"2026-01-04 08:15\"},\n",
+        "]\n",
+        "\n",
+        "# sort newest first\n",
+        "logs.sort(key=lambda x: x[\"time\"], reverse=True)\n",
+        "\n",
+        "print(\"Recently accessed files (newest first):\")\n",
+        "for entry in logs:\n",
+        "    print(entry[\"time\"], \"-\", entry[\"file\"], \"by\", entry[\"user\"])\n",
+        "\n",
+        "print(\"\\nFiles accessed by alice:\")\n",
+        "for entry in logs:\n",
+        "    if entry[\"user\"] == \"alice\":\n",
+        "        print(entry[\"file\"], \"-\", entry[\"time\"])"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from collections import defaultdict\n",
+        "\n",
+        "events = [\n",
+        "    {\"user\": \"admin\", \"src\": \"10.0.0.5\", \"result\": \"fail\"},\n",
+        "    {\"user\": \"admin\", \"src\": \"10.0.0.5\", \"result\": \"fail\"},\n",
+        "    {\"user\": \"admin\", \"src\": \"10.0.0.5\", \"result\": \"fail\"},\n",
+        "    {\"user\": \"john\",  \"src\": \"10.0.0.9\", \"result\": \"fail\"},\n",
+        "    {\"user\": \"john\",  \"src\": \"10.0.0.9\", \"result\": \"success\"},\n",
+        "]\n",
+        "\n",
+        "fail_count = defaultdict(int)\n",
+        "\n",
+        "for e in events:\n",
+        "    if e[\"result\"] == \"fail\":\n",
+        "        fail_count[(e[\"user\"], e[\"src\"])] += 1\n",
+        "\n",
+        "THRESHOLD = 3\n",
+        "print(\"Accounts/sources exceeding threshold:\")\n",
+        "for (user, src), count in fail_count.items():\n",
+        "    if count >= THRESHOLD:\n",
+        "        print(user, src, \"- Failures:\", count)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "mTibu48OTtIs",
+        "outputId": "36f6ac8d-b5ab-4c4f-e8e7-f497b4b3ae58"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Accounts/sources exceeding threshold:\n",
+            "admin 10.0.0.5 - Failures: 3\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "processes = [\n",
+        "    {\"pid\": 1, \"name\": \"explorer.exe\", \"parent\": None},\n",
+        "    {\"pid\": 2, \"name\": \"cmd.exe\", \"parent\": \"explorer.exe\"},\n",
+        "    {\"pid\": 3, \"name\": \"malware.exe\", \"parent\": \"wordpad.exe\"},  # unexpected parent\n",
+        "    {\"pid\": 4, \"name\": \"powershell.exe\", \"parent\": \"temp_launcher.exe\"},\n",
+        "]\n",
+        "\n",
+        "suspicious_parents = [\"wordpad.exe\", \"temp_launcher.exe\"]\n",
+        "\n",
+        "print(\"Process hierarchy:\")\n",
+        "for p in processes:\n",
+        "    print(p[\"pid\"], p[\"name\"], \"<-\", p[\"parent\"])\n",
+        "\n",
+        "print(\"\\nFlagged processes:\")\n",
+        "for p in processes:\n",
+        "    if p[\"parent\"] in suspicious_parents:\n",
+        "        print(p[\"name\"], \"flagged - unusual parent:\", p[\"parent\"])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7jyU56M-T2gw",
+        "outputId": "55f62db0-7b71-41cd-b101-68257ee9f3f8"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Process hierarchy:\n",
+            "1 explorer.exe <- None\n",
+            "2 cmd.exe <- explorer.exe\n",
+            "3 malware.exe <- wordpad.exe\n",
+            "4 powershell.exe <- temp_launcher.exe\n",
+            "\n",
+            "Flagged processes:\n",
+            "malware.exe flagged - unusual parent: wordpad.exe\n",
+            "powershell.exe flagged - unusual parent: temp_launcher.exe\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "authorized_devices = [\"USB1234\", \"USB5678\"]\n",
+        "\n",
+        "usb_events = [\n",
+        "    {\"device\": \"USB1234\", \"user\": \"alice\", \"time\": \"2026-01-01 10:00\"},\n",
+        "    {\"device\": \"USB9999\", \"user\": \"bob\",   \"time\": \"2026-01-02 15:00\"},\n",
+        "    {\"device\": \"USB5678\", \"user\": \"alice\", \"time\": \"2026-01-03 09:30\"},\n",
+        "]\n",
+        "\n",
+        "print(\"USB Connection Report:\")\n",
+        "unauthorized = []\n",
+        "for e in usb_events:\n",
+        "    status = \"Authorized\" if e[\"device\"] in authorized_devices else \"UNAUTHORIZED\"\n",
+        "    print(e[\"device\"], \"-\", e[\"user\"], \"-\", e[\"time\"], \"-\", status)\n",
+        "    if status == \"UNAUTHORIZED\":\n",
+        "        unauthorized.append(e)\n",
+        "\n",
+        "print(\"\\nSummary of unrecognized USB devices:\")\n",
+        "for e in unauthorized:\n",
+        "    print(e[\"device\"], \"used by\", e[\"user\"], \"at\", e[\"time\"])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "JsVrWwTIUdLI",
+        "outputId": "55059890-0b42-4c55-bc9f-f308dd18fa4e"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "USB Connection Report:\n",
+            "USB1234 - alice - 2026-01-01 10:00 - Authorized\n",
+            "USB9999 - bob - 2026-01-02 15:00 - UNAUTHORIZED\n",
+            "USB5678 - alice - 2026-01-03 09:30 - Authorized\n",
+            "\n",
+            "Summary of unrecognized USB devices:\n",
+            "USB9999 used by bob at 2026-01-02 15:00\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "events = [\n",
+        "    {\"source\": \"FileSystem\", \"time\": \"2026-01-01 10:00\", \"event\": \"File created\"},\n",
+        "    {\"source\": \"Network\",    \"time\": \"2026-01-01 09:50\", \"event\": \"Suspicious connection\"},\n",
+        "    {\"source\": \"SystemLog\",  \"time\": \"2026-01-01 10:05\", \"event\": \"Process started\"},\n",
+        "]\n",
+        "\n",
+        "# sort chronologically\n",
+        "events.sort(key=lambda x: x[\"time\"])\n",
+        "\n",
+        "print(\"Reconstructed Timeline:\")\n",
+        "for e in events:\n",
+        "    print(e[\"time\"], \"|\", e[\"source\"], \"|\", e[\"event\"])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5chhui4YUmcH",
+        "outputId": "f4be975b-cfa5-41dd-9afa-c3cbdf03cb9a"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Reconstructed Timeline:\n",
+            "2026-01-01 09:50 | Network | Suspicious connection\n",
+            "2026-01-01 10:00 | FileSystem | File created\n",
+            "2026-01-01 10:05 | SystemLog | Process started\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "files = [\n",
+        "    {\"name\": \"report.docx\", \"hidden_attr\": False},\n",
+        "    {\"name\": \".secret_data\", \"hidden_attr\": False},\n",
+        "    {\"name\": \"~cache_temp\", \"hidden_attr\": True},\n",
+        "    {\"name\": \"notes.txt\", \"hidden_attr\": False},\n",
+        "]\n",
+        "\n",
+        "hidden_patterns = [\".\", \"~\"]\n",
+        "\n",
+        "print(\"File Scan Report:\")\n",
+        "for f in files:\n",
+        "    name = f[\"name\"]\n",
+        "    is_hidden = f[\"hidden_attr\"] or any(name.startswith(p) for p in hidden_patterns)\n",
+        "    status = \"HIDDEN/SUSPICIOUS\" if is_hidden else \"Normal\"\n",
+        "    print(name, \"-\", status)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gLEyo417UylS",
+        "outputId": "bdcd422e-ab7a-4916-e40b-c5f69e2fb836"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "File Scan Report:\n",
+            "report.docx - Normal\n",
+            ".secret_data - HIDDEN/SUSPICIOUS\n",
+            "~cache_temp - HIDDEN/SUSPICIOUS\n",
+            "notes.txt - Normal\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "files = [\n",
+        "    {\"name\": \"payroll.xlsx\", \"permissions\": \"rwxrwxrwx\"},  # too open\n",
+        "    {\"name\": \"readme.txt\", \"permissions\": \"rw-r--r--\"},\n",
+        "    {\"name\": \"server_config.ini\", \"permissions\": \"rwxrwx---\"},  # group can execute\n",
+        "]\n",
+        "\n",
+        "def check_risk(perm):\n",
+        "    if perm[6:9] != \"---\" and \"w\" in perm[6:9]:\n",
+        "        return \"HIGH - others can write\"\n",
+        "    if perm[6:9] != \"---\":\n",
+        "        return \"MEDIUM - others have access\"\n",
+        "    if \"x\" in perm[3:6]:\n",
+        "        return \"LOW - group can execute\"\n",
+        "    return \"OK\"\n",
+        "\n",
+        "print(\"Permission Audit Report:\")\n",
+        "for f in files:\n",
+        "    risk = check_risk(f[\"permissions\"])\n",
+        "    print(f[\"name\"], \"-\", f[\"permissions\"], \"-\", risk)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "q2POT1noVLea",
+        "outputId": "3015aa1a-9b8c-4705-cd17-1c41162a8dec"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Permission Audit Report:\n",
+            "payroll.xlsx - rwxrwxrwx - HIGH - others can write\n",
+            "readme.txt - rw-r--r-- - MEDIUM - others have access\n",
+            "server_config.ini - rwxrwx--- - LOW - group can execute\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
