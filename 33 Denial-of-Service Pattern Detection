@@ -1,0 +1,75 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMCeN/exPLhJ111nppiTFeS",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sb-dharshini/CSA610-DIGITALFORENSIC-/blob/main/33%20Denial-of-Service%20Pattern%20Detection\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from collections import defaultdict\n",
+        "\n",
+        "packets = [\n",
+        "    {\"src\": \"1.1.1.1\", \"dst\": \"server1\", \"time\": \"10:00:01\"},\n",
+        "    {\"src\": \"2.2.2.2\", \"dst\": \"server1\", \"time\": \"10:00:01\"},\n",
+        "    {\"src\": \"3.3.3.3\", \"dst\": \"server1\", \"time\": \"10:00:02\"},\n",
+        "    {\"src\": \"4.4.4.4\", \"dst\": \"server1\", \"time\": \"10:00:02\"},\n",
+        "    {\"src\": \"5.5.5.5\", \"dst\": \"server2\", \"time\": \"10:00:03\"},\n",
+        "]\n",
+        "\n",
+        "dst_count = defaultdict(int)\n",
+        "for p in packets:\n",
+        "    dst_count[p[\"dst\"]] += 1\n",
+        "\n",
+        "THRESHOLD = 4\n",
+        "print(\"Traffic per destination:\")\n",
+        "for dst, count in dst_count.items():\n",
+        "    print(dst, \"-\", count, \"packets\")\n",
+        "    if count >= THRESHOLD:\n",
+        "        print(\"   -> Possible DoS activity detected (high concentrated traffic)\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7VG84gwUW0ke",
+        "outputId": "e2968549-2593-4461-b46c-1e21ed3b3ede"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Traffic per destination:\n",
+            "server1 - 4 packets\n",
+            "   -> Possible DoS activity detected (high concentrated traffic)\n",
+            "server2 - 1 packets\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
